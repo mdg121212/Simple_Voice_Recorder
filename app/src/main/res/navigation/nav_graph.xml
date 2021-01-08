@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/RecordFragment">
+
+    <fragment
+        android:id="@+id/RecordFragment"
+        android:name="com.mattg.simplevoicerecorder.ui.RecordFragment"
+        android:label="@string/first_fragment_label"
+        tools:layout="@layout/fragment_record">
+
+        <action
+            android:id="@+id/action_RecordFragment_to_SecondFragment"
+            app:destination="@id/PlaybackFragment" />
+        <action
+            android:id="@+id/action_RecordFragment_to_recordingListFragment"
+            app:destination="@id/recordingListFragment" />
+        <action
+            android:id="@+id/action_RecordFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/PlaybackFragment"
+        android:name="com.mattg.simplevoicerecorder.ui.PlayBackFragment"
+        android:label="@string/second_fragment_label"
+        tools:layout="@layout/fragment_playback">
+
+        <action
+            android:id="@+id/action_SecondFragment_to_RecordFragment"
+            app:destination="@id/RecordFragment" />
+        <argument
+            android:name="recording"
+            android:defaultValue="@null"
+            app:argType="com.mattg.simplevoicerecorder.db.Recording"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_PlaybackFragment_to_recordingListFragment"
+            app:destination="@id/recordingListFragment"
+            app:popUpTo="@id/RecordFragment" />
+        <action
+            android:id="@+id/action_PlaybackFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_PlaybackFragment_self"
+            app:destination="@id/PlaybackFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recordingListFragment"
+        android:name="com.mattg.simplevoicerecorder.ui.RecordingListFragment"
+        android:label="recording_list_fragment"
+        tools:layout="@layout/recording_list_fragment">
+        <action
+            android:id="@+id/action_recordingListFragment_to_SecondFragment"
+            app:destination="@id/PlaybackFragment" />
+        <action
+            android:id="@+id/action_recordingListFragment_to_RecordFragment"
+            app:destination="@id/RecordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.mattg.simplevoicerecorder.ui.SettingsFragment"
+        android:label="SettingsFragment" />
+</navigation>
