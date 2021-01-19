@@ -32,7 +32,7 @@ class Prefs(private val context: Context) {
 
     fun shouldAskForReview(): Boolean {
         val prefs = getPrefs()
-        if (getPrefOpens() > 2) {
+        if (getPrefOpens() > 5) {
             val haveAsked = prefs.getBoolean("have_asked_review", false)
             return haveAsked
         } else return false

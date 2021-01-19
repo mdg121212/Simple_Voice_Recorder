@@ -1,9 +1,11 @@
 package com.mattg.simplevoicerecorder.ui.util
 
 import android.app.Application
+import android.content.Context
 import android.preference.PreferenceManager
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.multidex.MultiDex
 import java.util.*
 
 class SimpleVoiceApplication : Application(){
@@ -17,8 +19,8 @@ class SimpleVoiceApplication : Application(){
             val mode = NightMode.valueOf(this.toUpperCase(Locale.US))
             Log.i("TESTING", "mode = $mode")
             AppCompatDelegate.setDefaultNightMode(mode.value)
-
         }
 
     }
+
 }

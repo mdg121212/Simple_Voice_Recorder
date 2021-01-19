@@ -146,8 +146,9 @@ class RecordFragment : Fragment() {
             resetView()
         }
 
-        ReviewPrompt(requireContext(), requireActivity()).promptForReview()
-        // ReviewPrompt(requireContext()).nukePrefs()
+     //   ReviewPrompt(requireContext(), requireActivity()).promptForReview()
+
+
 
     }
 
@@ -290,7 +291,7 @@ class RecordFragment : Fragment() {
     }
 
     private fun informUserAboutPermissions() {
-
+        Toast.makeText(requireContext(), "You need to enable permissions for the app to function", Toast.LENGTH_SHORT).show()
     }
 
 
