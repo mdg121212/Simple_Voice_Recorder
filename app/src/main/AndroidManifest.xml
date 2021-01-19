@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.mattg.simplevoicerecorder">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -39,7 +38,7 @@
         </provider>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-8282545537858033~2142927938"/>
+            android:value="ca-app-pub--a-valid-id"/>
 
     </application>
 
