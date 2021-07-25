@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SimpleVoiceRecorder">
+        android:theme="@style/Theme.SimpleVoiceRecorder.Launcher">
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"
@@ -38,7 +38,7 @@
         </provider>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub--a-valid-id"/>
+            android:value="ca-app-pub-8282545537858033~2142927938"/>
 
     </application>
 

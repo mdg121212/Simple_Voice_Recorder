@@ -24,6 +24,9 @@
         <item name="android:windowContentOverlay">@null</item>
 
     </style>
+    <style name="Theme.SimpleVoiceRecorder.Launcher" parent="Theme.SimpleVoiceRecorder.NoStatusBar">
+        <item name="android:drawable">@color/teal_700</item>
+</style>
 
     <style name="Theme.SimpleVoiceRecorder.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
+<data>
+ <variable
+     name="viewModel"
+     type="com.mattg.simplevoicerecorder.ui.RecordViewModel" />
+</data>
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -15,6 +22,8 @@
         android:layout_marginBottom="16dp"
         android:hint="@string/filename_text"
         android:lines="1"
+        android:visibility="@{viewModel.isFileNameEditTextVisible()}"
+        android:text="@={viewModel._fileNameText}"
         app:layout_constraintBottom_toTopOf="@+id/tv_recordingTime"
         app:layout_constraintEnd_toStartOf="@+id/btn_saveRecording"
         app:layout_constraintStart_toStartOf="parent" />
@@ -47,6 +56,8 @@
         android:contentDescription="@string/content_record_button"
         android:scaleType="fitXY"
         android:src="@drawable/recordblue"
+        android:visibility="@{viewModel.isRecordButtonVisible()}"
+        android:onClick="@{() -> viewModel.recordClick()}"
         app:layout_constraintBottom_toTopOf="@+id/tv_availableSpace"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -58,6 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:textSize="@dimen/medium_text"
+        android:text="@{String.format(@string/storage_space, viewModel.storageSpaceValue)}"
         app:layout_constraintBottom_toTopOf="@+id/tv_warning"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -70,6 +82,7 @@
         android:textSize="@dimen/medium_text"
         app:layout_constraintBottom_toTopOf="@+id/btn_record"
         app:layout_constraintEnd_toEndOf="parent"
+        android:text="@{viewModel.recordingStateText}"
         app:layout_constraintStart_toStartOf="parent" />
 
 
@@ -80,6 +93,7 @@
         android:layout_marginBottom="16dp"
         android:drawableStart="@drawable/ic_baseline_list_24"
         android:text="@string/view_recordings"
+        android:onClick="@{() -> viewModel.viewRecordingsClick()}"
         app:layout_constraintBottom_toTopOf="@+id/adView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.511"
@@ -93,6 +107,7 @@
         android:layout_marginEnd="16dp"
         android:background="@android:color/transparent"
         android:scaleType="fitXY"
+        android:onClick="@{() -> viewModel.settingsClick()}"
         android:src="@drawable/ic_baseline_settings_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -106,7 +121,8 @@
         android:contentDescription="@string/button_to_stop_recording"
         android:scaleType="fitXY"
         android:src="@drawable/stopblue"
-        android:visibility="gone"
+        android:visibility="@{viewModel.isStopButtonVisible()}"
+        android:onClick="@{() -> viewModel.stopRecording()}"
         app:layout_constraintBottom_toBottomOf="@+id/btn_record"
         app:layout_constraintEnd_toStartOf="@+id/btn_record"
         app:layout_constraintTop_toTopOf="@+id/btn_record" />
@@ -118,7 +134,8 @@
         android:background="@android:color/transparent"
         android:scaleType="fitXY"
         android:src="@drawable/playblue"
-        android:visibility="gone"
+        android:visibility="@{viewModel.isPlayButtonVisible()}"
+        android:onClick="@{() -> viewModel.playClick()}"
         app:layout_constraintBottom_toBottomOf="@+id/btn_record"
         app:layout_constraintStart_toEndOf="@+id/btn_record"
         app:layout_constraintTop_toTopOf="@+id/btn_record" />
@@ -131,7 +148,8 @@
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
         android:src="@drawable/diskblue"
-        android:visibility="gone"
+        android:visibility="@{viewModel.isFileNameEditTextVisible()}"
+        android:onClick="@{() -> viewModel.saveClick()}"
         app:layout_constraintBottom_toBottomOf="@+id/et_fileName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/et_fileName" />
@@ -145,7 +163,8 @@
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_baseline_refresh_24"
-        android:visibility="gone"
+        android:visibility="@{viewModel.isReloadButtonVisible()}"
+        android:onClick="@{() -> viewModel.reloadClick()}"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -156,7 +175,7 @@
         android:layout_marginBottom="19dp"
         android:text="Warning: Recording will stop\nif you leave this screen."
         android:textAlignment="center"
-        android:visibility="invisible"
+        android:visibility="@{viewModel.isStopButtonVisible()}"
         app:layout_constraintBottom_toTopOf="@+id/btn_viewRecordings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -175,3 +194,4 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

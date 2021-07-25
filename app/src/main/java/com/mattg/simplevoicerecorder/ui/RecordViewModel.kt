@@ -7,15 +7,20 @@ import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.util.Log
+import android.view.View
+import android.widget.Toast
+import androidx.databinding.Bindable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
 import com.mattg.simplevoicerecorder.R
 import com.mattg.simplevoicerecorder.db.Recording
 import com.mattg.simplevoicerecorder.db.RecordingDatabase
 import com.mattg.simplevoicerecorder.db.RecordingRepository
+import com.mattg.simplevoicerecorder.ui.util.Event
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,31 +47,79 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
 
     private val _stopButtonVisible = MutableLiveData<Boolean>()
     val stopButtonVisible: LiveData<Boolean> = _stopButtonVisible
+    fun isStopButtonVisible() : Int {
+        stopButtonVisible.value?.apply {
+            return if(this) View.VISIBLE else View.GONE
+        }
+        return View.GONE
+
+    }
 
     private val _playButtonVisible = MutableLiveData<Boolean>()
     val playButtonVisible: LiveData<Boolean> = _playButtonVisible
+    fun isPlayButtonVisible() : Int {
+        playButtonVisible.value?.apply {
+            return if(this) View.VISIBLE else View.GONE
+        }
+        return View.GONE
+
+    }
 
     private val _reloadButtonVisible = MutableLiveData<Boolean>()
     val reloadButtonVisible: LiveData<Boolean> = _reloadButtonVisible
+    fun isReloadButtonVisible() : Int {
+        _reloadButtonVisible.value?.apply {
+            return  if(this)  View.VISIBLE else View.GONE
+        }
+        return View.GONE
+    }
 
+    private val _recordButtonVisible = MutableLiveData<Boolean>()
+    val recordButtonVisible: LiveData<Boolean> = _recordButtonVisible
+    fun isRecordButtonVisible() : Int {
+        _recordButtonVisible.value?.apply {
+            return if(this) View.VISIBLE else View.GONE
+        }
+        return View.GONE
+
+    }
     private val _recordButtonDrawable = MutableLiveData<Int>()
     val recordButtonDrawable: LiveData<Int> = _recordButtonDrawable
-
+    fun getRecordButtonDrawable(): Int {
+        return recordButtonDrawable.value!!
+    }
     private val _isRecording = MutableLiveData<Boolean>()
     val isRecording: LiveData<Boolean> = _isRecording
 
     private val _fileNameEditTextVisible = MutableLiveData<Boolean>()
     val fileNameEditTextVisible: LiveData<Boolean> = _fileNameEditTextVisible
-
+    fun isFileNameEditTextVisible() : Int {
+        fileNameEditTextVisible.value?.apply {
+            return if(this) View.VISIBLE else View.GONE
+        }
+        return View.GONE
+    }
     private val _isPaused = MutableLiveData<Boolean>()
     val isPaused: LiveData<Boolean> = _isPaused
 
     private val _currentFileName = MutableLiveData<String>()
     val currentFileName: LiveData<String> = _currentFileName
 
-    private val _fileNameText = MutableLiveData<String>()
+    val _fileNameText = MutableLiveData<String>()
     val fileNameText: LiveData<String> = _fileNameText
-
+    fun setFileNameText(fileName: String){
+        _fileNameText.postValue(fileName)
+    }
+    private val _navigationActionId = MutableLiveData<Event<Int>>()
+    val navigationActionId: LiveData<Event<Int>> = _navigationActionId
+    fun setNavigationId(id: Int){
+        _navigationActionId.postValue(Event(id))
+    }
+    private val _resetViewAction = MutableLiveData<Event<Boolean>>()
+    public val resetViewAction: LiveData<Event<Boolean>> = _resetViewAction
+    public fun setResetViewAction(shouldReset: Boolean){
+        _resetViewAction.postValue(Event(shouldReset))
+    }
     private val _recorderState = MutableLiveData<RecorderState>()
     val recorderState: LiveData<RecorderState> = _recorderState
 
@@ -84,6 +137,13 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
 
     private val _amplitudeForVisual = MutableLiveData<Int>()
     val amplitudeForVisual: LiveData<Int> = _amplitudeForVisual
+
+    private val _toastMessageText = MutableLiveData<Event<String>>()
+    val toastMessageText: LiveData<Event<String>> = _toastMessageText
+    private fun setToast(message: String){
+        _toastMessageText.postValue(Event(message))
+    }
+
 
     private var storageDir: String = ""
     private var folder: String = ""
@@ -375,6 +435,57 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
         }
         return returnString
     }
+    /* <---------------------------------- Binding Methdods ----------------------------------------->*/
+    fun recordClick(){
+        when (isRecording.value) {
+            true -> {
+               pauseRecording()
+            }
+            false -> {
+                Log.i(
+                    "TESTING",
+                    "misrecording is false, and is paused is ${isPaused.value}"
+                )
+                if (isPaused.value == true) resumeRecording() else startRecording()
+            }
+        }
+    }
 
+   fun saveClick() {
+        val newFileName = if (_fileNameText.value!!.isEmpty())  _fileNameText.value else ""
+        val wasChanged = changeStoredFileName(newFileName!!)
+        Log.i("SAVING", " was changed = $wasChanged")
+        if (wasChanged) {
+            setViewSaved()
+            setToast("Recording Saved!")
+        } else {
+            setToast("Error saving recording to database...")
+        }
+    }
 
-}
+   fun viewRecordingsClick() {
+           setEnded()
+           resetView()
+           //navigate(R.id.action_RecordFragment_to_recordingListFragment)
+            setNavigationId(R.id.action_RecordFragment_to_recordingListFragment)
+   }
+
+    fun settingsClick() {
+       // settings.setOnClickListener {
+        setNavigationId(R.id.action_RecordFragment_to_settingsFragment)
+    }
+
+    fun playClick() {
+            val recording = getRecording()
+            if (recording != null) {
+                setNavigationId(R.id.action_RecordFragment_to_SecondFragment)
+                resetView()
+            } else
+        setToast("No recording to play, save first")
+        }
+
+    fun reloadClick() {
+        resetView()
+        setResetViewAction(true)
+      }
+    }

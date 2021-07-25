@@ -14,12 +14,14 @@ import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.mattg.simplevoicerecorder.R
 import com.mattg.simplevoicerecorder.databinding.FragmentRecordBinding
+import com.mattg.simplevoicerecorder.ui.util.Event
 import com.visualizer.amplitude.AudioRecordView
 
 
@@ -47,13 +49,13 @@ class RecordFragment : Fragment() {
     private lateinit var time: TextView
     private lateinit var warn: TextView
     private lateinit var visualizer: AudioRecordView
-    private var mIsRecording = false
-    private var mIsPaused = false
-    private var wasJustSaved = false
+  //  private var mIsRecording = false
+   // private var mIsPaused = false
+ //   private var wasJustSaved = false
     private lateinit var animation: Animation
     private lateinit var sizeAnimation: Animation
     private lateinit var mAdView: AdView
-    private var wasPlayAnimation = false
+    //private var wasPlayAnimation = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,6 +66,7 @@ class RecordFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        activity?.setTheme(R.style.Theme_SimpleVoiceRecorder)
         super.onViewCreated(view, savedInstanceState)
         ActivityCompat.requestPermissions(
             requireActivity(),
@@ -81,72 +84,40 @@ class RecordFragment : Fragment() {
         }
         observeViewModel()
 
-        record.setOnClickListener {
-            when (mIsRecording) {
-                true -> {
-                    viewModel.pauseRecording()
-                }
-                false -> {
-                    Log.i(
-                        "TESTING",
-                        "misrecording is false, and its going to check mIsPaused $mIsPaused"
-                    )
-                    if (mIsPaused) viewModel.resumeRecording() else viewModel.startRecording()
-                }
-            }
+//        stop.setOnClickListener {
+//            viewModel.stopRecording()
+//        }
 
+//        viewRecordings.setOnClickListener {
+//            viewModel.setEnded()
+//            resetView()
+//            findNavController().navigate(R.id.action_RecordFragment_to_recordingListFragment)
+//        }
 
-        }
-        stop.setOnClickListener {
-            viewModel.stopRecording()
-        }
+//        settings.setOnClickListener {
+//            findNavController().navigate(R.id.action_RecordFragment_to_settingsFragment)
+//        }
 
-        save.setOnClickListener {
+//        play.setOnClickListener {
+//            val recording = viewModel.getRecording()
+//            if (recording != null) {
+//                val action =
+//                    RecordFragmentDirections.actionRecordFragmentToSecondFragment(recording)
+//                findNavController().navigate(action)
+//                resetView()
+//            } else Toast.makeText(
+//                requireContext(),
+//                "No recording to play, save first",
+//                Toast.LENGTH_SHORT
+//            )
+//                .show()
+//        }
 
-            val newFileName = etFileName.text.trim().toString()
-            val wasChanged = viewModel.changeStoredFileName(newFileName)
-            Log.i("SAVING", " was changed = $wasChanged")
-            if (wasChanged) {
-                viewModel.setViewSaved()
-                Toast.makeText(requireContext(), "Saved Recording", Toast.LENGTH_SHORT).show()
-            } else Toast.makeText(
-                requireContext(),
-                "Error saving to database",
-                Toast.LENGTH_SHORT
-            ).show()
+//        reload.setOnClickListener {
+//            resetView()
+//        }
 
-        }
-
-        viewRecordings.setOnClickListener {
-            viewModel.setEnded()
-            resetView()
-            findNavController().navigate(R.id.action_RecordFragment_to_recordingListFragment)
-        }
-
-        settings.setOnClickListener {
-            findNavController().navigate(R.id.action_RecordFragment_to_settingsFragment)
-        }
-
-        play.setOnClickListener {
-            val recording = viewModel.getRecording()
-            if (recording != null) {
-                val action =
-                    RecordFragmentDirections.actionRecordFragmentToSecondFragment(recording)
-                findNavController().navigate(action)
-                resetView()
-            } else Toast.makeText(
-                requireContext(),
-                "No recording to play, save first",
-                Toast.LENGTH_SHORT
-            )
-                .show()
-        }
-
-        reload.setOnClickListener {
-            resetView()
-        }
-
-     //   ReviewPrompt(requireContext(), requireActivity()).promptForReview()
+        ReviewPrompt(requireContext(), requireActivity()).promptForReview()
 
 
 
@@ -158,7 +129,7 @@ class RecordFragment : Fragment() {
         viewRecordings = binding.btnViewRecordings
         settings = binding.btnSettings
         play = binding.btnRecordPlay
-        stop = binding.btnStopRecord
+        //stop = binding.btnStopRecord
         etFileName = binding.etFileName
         save = binding.btnSaveRecording
         reload = binding.btnReload
@@ -176,16 +147,26 @@ class RecordFragment : Fragment() {
 
     }
 
-
-    private fun resetView() {
-        viewModel.resetView()
-        wasJustSaved = false
-        ViewAnimation().moveBackFromRight(play, 50f)
-    }
+//    private fun resetView() {
+//        viewModel.resetView()
+//        wasJustSaved = false
+//        ViewAnimation().moveBackFromRight(play, 50f)
+//    }
 
     @SuppressLint("SetTextI18n")
     private fun observeViewModel() {
         viewModel.clearRecordingOnCreate()
+        viewModel.resetViewAction.observe(viewLifecycleOwner){
+            it.getContentIfNotHandled()?.let {
+                viewModel.resetView()
+                ViewAnimation().moveBackFromRight(play, 50f)
+            }
+        }
+        viewModel.navigationActionId.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled()?.let { // Only proceed if the event has never been handled
+                findNavController().navigate(it)
+            }
+        }
         viewModel.isRecordingForAnimation.observe(viewLifecycleOwner) {
             when (it) {
                 true -> {
@@ -204,44 +185,44 @@ class RecordFragment : Fragment() {
         viewModel.stopButtonVisible.observe(viewLifecycleOwner) {
             when (it) {
                 true -> {
-                    warn.visibility = View.VISIBLE
-                    stop.visibility = View.VISIBLE
+               //     warn.visibility = View.VISIBLE
+               //     stop.visibility = View.VISIBLE
                     ViewAnimation().moveLeft(stop, 50f)
 
                 }
                 false -> {
-                    stop.visibility = View.GONE
-                    warn.visibility = View.GONE
+              //      stop.visibility = View.GONE
+              //      warn.visibility = View.GONE
                 }
             }
         }
-        viewModel.storageSpaceValue.observe(viewLifecycleOwner) {
-            space.text = "$it Available Space"
-        }
-        viewModel.reloadButtonVisible.observe(viewLifecycleOwner) {
-            reload.visibility = if (it) View.VISIBLE else View.GONE
-        }
-        viewModel.isRecording.observe(viewLifecycleOwner) {
-            mIsRecording = it
-        }
+//        viewModel.storageSpaceValue.observe(viewLifecycleOwner) {
+//            space.text = "$it Available Space"
+//        }
+//        viewModel.reloadButtonVisible.observe(viewLifecycleOwner) {
+//            reload.visibility = if (it) View.VISIBLE else View.GONE
+//        }
+//        viewModel.isRecording.observe(viewLifecycleOwner) {
+//            mIsRecording = it
+//        }
         viewModel.recordButtonDrawable.observe(viewLifecycleOwner) {
             record.setImageResource(it)
         }
-        viewModel.isPaused.observe(viewLifecycleOwner) {
-            mIsPaused = it
-        }
+//        viewModel.isPaused.observe(viewLifecycleOwner) {
+//            mIsPaused = it
+//        }
         viewModel.playButtonVisible.observe(viewLifecycleOwner) {
             when (it) {
                 true -> {
-                    play.visibility = View.VISIBLE
-                    if (!wasJustSaved) {
-                        if (!wasPlayAnimation) {
+                //    play.visibility = View.VISIBLE
+                //    if (!wasJustSaved) {
+                    //    if (!wasPlayAnimation) {
                             ViewAnimation().moveRight(play, 50f)
-                            wasPlayAnimation = true
-                        }
-                    }
+                           // wasPlayAnimation = true
+                     //   }
+                  //  }
                 }
-                false -> play.visibility = View.GONE
+             //   false -> play.visibility = View.GONE
             }
         }
         viewModel.amplitudeForVisual.observe(viewLifecycleOwner) {
@@ -249,25 +230,25 @@ class RecordFragment : Fragment() {
                 visualizer.update(it)
             }
         }
-        viewModel.fileNameEditTextVisible.observe(viewLifecycleOwner) {
-            when (it) {
-                true -> {
-                    etFileName.visibility = View.VISIBLE
-                    etFileName.setText(viewModel.fileNameText.value.toString())
-                    save.visibility = View.VISIBLE
-                }
-                false -> {
-                    etFileName.visibility = View.GONE
-                    save.visibility = View.GONE
-                }
-            }
-        }
-        viewModel.recordingTimeReadable.observe(viewLifecycleOwner) {
-
-        }
-        viewModel.recordingStateText.observe(viewLifecycleOwner) {
-            time.text = it
-        }
+//        viewModel.fileNameEditTextVisible.observe(viewLifecycleOwner) {
+//            when (it) {
+//                true -> {
+//                    etFileName.visibility = View.VISIBLE
+//                    etFileName.setText(viewModel.fileNameText.value.toString())
+//                    save.visibility = View.VISIBLE
+//                }
+//                false -> {
+//                    etFileName.visibility = View.GONE
+//                    save.visibility = View.GONE
+//                }
+//            }
+//        }
+//        viewModel.recordingTimeReadable.observe(viewLifecycleOwner) {
+//
+//        }
+//        viewModel.recordingStateText.observe(viewLifecycleOwner) {
+//            time.text = it
+//        }
     }
 
 
@@ -295,4 +276,11 @@ class RecordFragment : Fragment() {
     }
 
 
+}
+
+/**
+ * Extension function to allow navigation based on id passed from LiveData Event
+ */
+private fun NavController.navigate(it: Event<Int>?) {
+        this.navigate(it)
 }
